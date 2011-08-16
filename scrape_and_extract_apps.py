@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# scrape_android_market_phase_1A
+# scrape_and_extract_apps
 import sys
 sys.path.append('../')
 reload(sys)
