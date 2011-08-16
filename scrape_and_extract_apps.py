@@ -5,8 +5,6 @@ sys.path.append('../')
 reload(sys)
 from android_market_data import utilities
 reload(utilities)
-from android_market_data import db  # only needed for db.persist_apps() 
-reload(db)
 
 sys.setdefaultencoding('utf-8')
 reload(sys)
@@ -74,7 +72,7 @@ def get(url,read_from_cache=True,write_to_cache=True):
             html_cache.write(html)
             resolved_url_cache=open(resolved_url_cache_path,'w')
             resolved_url_cache.write(resolved_url)
-    return tuple ([html,resolved_url])
+    return (html,resolved_url)
 
 #todo: should put the summary processing thing in here     maybe... but then it would all have to work at once...?  well, just for one page, that's a good thing.
 #todo:  really should put the recursive 'try again' thing here into get() instead, except with the default being attempts_remaining=0.  the thing about that is that 
@@ -366,9 +364,12 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     # assign Android Market ranks,  we got them in order; use that order.
     for n in range(len(app_l)):
         app_l[n]['market_rank']=n
-    #app_l_ranked=assign_appbackr_ranks_one_category(app_l,bayesian_average_score,'bayesian_average_score')  # this also mods the original dict in place, giving it rankings
-    #print app_l_ranked[0]  #todo kill this
-    db.persist_apps(app_l)
+    
+    # do something with the list of apps here.  for example, persist them.
+    #from android_market_data import db   
+    #reload(db)
+    #db.persist_apps(app_l)
+        
     if len(app_l)>0:
         print 'timestamp of this scrape: '+str(app_l[0]['scrape_timestamp'])
         print 'count of applications loaded into database: '+str(len(app_l))
