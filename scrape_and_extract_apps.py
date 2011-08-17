@@ -348,11 +348,7 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     initialize_globals(html_cache_path,resolved_urls_cache_path,_download_from_web=_download_from_web,_read_from_cache=_read_from_cache,_write_to_cache=_write_to_cache)
     scrape_timestamp=int(time.mktime(scrape_date.timetuple()) * 1000)  
     extraction_timestamp=int(time.mktime(extraction_date.timetuple()) * 1000)
-    if offline:
-        print '--OFFLINE SCRAPE--'
-    else:
-        print '-- online scrape --'
-        if scrape_date != extraction_date:
+    if not offline and (scrape_date != extraction_date):
             raise Exception('this is supposed to be an online scrape yet the extraction date is different from the scrape date.  wtf.')
     print 'scrape_date:' + str(scrape_date)
     print 'scrape_timestamp:' + str(scrape_timestamp)
@@ -378,8 +374,8 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     else:
         print 'ERROR (or unexpected):   Results count is zero!'
     end_time=datetime.datetime.now()
-    print 'scrape start time:'+str(start_time)
-    print 'scrape end time:  '+str(end_time)
+    print 'category scrape time:'+str(start_time)
+    print 'category scrape end time:  '+str(end_time)
     print 'elapsed time:     '+str(end_time-start_time)
 
 def initialize_globals(_html_cache_path, _resolved_urls_cache_path, _download_from_web, _read_from_cache, _write_to_cache ):
