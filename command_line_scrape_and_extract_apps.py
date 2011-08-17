@@ -107,7 +107,7 @@ if __name__ == "__main__":
         print "pay types"+str(pay_types)
         for pay_type in pay_types:
             if category.lower()=='all':
-                cats=get_categories('https://market.android.com/apps/GAME',use_cache=False)
+                cats=scrape_and_extract_apps.get_categories()
             else:  
                 cats=[category]
             print 'categories.  (count: '+str(len(cats))+') '+str(cats)
