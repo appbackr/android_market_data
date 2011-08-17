@@ -13,8 +13,8 @@ import urllib2, BeautifulSoup, re, urlparse,  datetime, traceback, time, os
 ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML='../cache/dummy_html/' 
 ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS='../cache/dummy_resolved_urls/' 
 download_from_web=True
-read_from_cache=True
-write_to_cache=True
+read_from_cache=False
+write_to_cache=False
 downloaded_urls=[]
 
 CATEGORY_L=[u'GAME', u'ARCADE', u'BRAIN', u'CARDS', u'CASUAL', u'GAME_WALLPAPER', u'RACING', u'SPORTS_GAMES', u'GAME_WIDGETS', u'APPLICATION', u'BOOKS_AND_REFERENCE', u'BUSINESS', u'COMICS', u'COMMUNICATION', u'EDUCATION', u'ENTERTAINMENT', u'FINANCE', u'HEALTH_AND_FITNESS', u'LIBRARIES_AND_DEMO', u'LIFESTYLE', u'APP_WALLPAPER', u'MEDIA_AND_VIDEO', u'MEDICAL', u'MUSIC_AND_AUDIO', u'NEWS_AND_MAGAZINES', u'PERSONALIZATION', u'PHOTOGRAPHY', u'PRODUCTIVITY', u'SHOPPING', u'SOCIAL', u'SPORTS', u'TOOLS', u'TRANSPORTATION', u'TRAVEL_AND_LOCAL', u'WEATHER', u'APP_WIDGETS']
