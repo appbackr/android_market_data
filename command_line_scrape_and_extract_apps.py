@@ -39,7 +39,6 @@ if __name__ == "__main__":
     print 'now starting scrape'
     import os
     os.chdir(working_dir)
-    import sys
     sys.path.append(working_dir)
     reload(sys)
     import datetime,time
@@ -47,7 +46,6 @@ if __name__ == "__main__":
     reload(utilities)
     from android_market_data import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
-
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     print 'extraction_date: '+str(extraction_date)

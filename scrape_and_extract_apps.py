@@ -10,21 +10,19 @@ sys.setdefaultencoding('utf-8')
 reload(sys)
 import urllib2, BeautifulSoup, re, urlparse,  datetime, traceback, time, os
 
-global ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML
 ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML='../cache/dummy_html/' 
-global ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS
 ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS='../cache/dummy_resolved_urls/' 
-global OFFLINE   #this is mistaken, i think.   i think the way to go is to add a arg (with default value of True) to get() which is download_from_web.  Will try this in android_reviews.post()
-OFFLINE='' # this is a boolean
-global scraped_app_l
+download_from_web=True
+read_from_cache=True
+write_to_cache=True
 downloaded_urls=[]
 
 CATEGORY_L=[u'GAME', u'ARCADE', u'BRAIN', u'CARDS', u'CASUAL', u'GAME_WALLPAPER', u'RACING', u'SPORTS_GAMES', u'GAME_WIDGETS', u'APPLICATION', u'BOOKS_AND_REFERENCE', u'BUSINESS', u'COMICS', u'COMMUNICATION', u'EDUCATION', u'ENTERTAINMENT', u'FINANCE', u'HEALTH_AND_FITNESS', u'LIBRARIES_AND_DEMO', u'LIFESTYLE', u'APP_WALLPAPER', u'MEDIA_AND_VIDEO', u'MEDICAL', u'MUSIC_AND_AUDIO', u'NEWS_AND_MAGAZINES', u'PERSONALIZATION', u'PHOTOGRAPHY', u'PRODUCTIVITY', u'SHOPPING', u'SOCIAL', u'SPORTS', u'TOOLS', u'TRANSPORTATION', u'TRAVEL_AND_LOCAL', u'WEATHER', u'APP_WIDGETS']
 
-def get_categories_old(u,use_cache=True):  
+def get_categories_old(u):  
     print 'get_categories: ' + u
     print 'BeautifulSoup.__version__ ' + BeautifulSoup.__version__
-    page, _ = get(u,read_from_cache=use_cache,write_to_cache=use_cache)
+    page, _ = get(u)
     soup = BeautifulSoup.BeautifulSoup(page, fromEncoding='utf-8')
     rez=soup.findAll(attrs={"class":"top-nav-sub-item"})  #main-menu-sub-item-last
     categories=[]
@@ -36,16 +34,13 @@ def get_categories_old(u,use_cache=True):
             categories+=[cat]
     return categories
 
-def get_categories(_,use_cache=False):
+def get_categories():
     return CATEGORY_L
 
 # caches results, returns cached values
 # returns 2-tuple of the html behind this url (after any redirection) and whatever this url ultimately redirected to (if there was no redirection, then this is just the original url of course)
-def get(url,read_from_cache=True,write_to_cache=True):
-    global OFFLINE
-    if OFFLINE:
-        read_from_cache=True  # wouldn't be rational otherwise
-    global downloaded_urls
+def get(url):
+    global download_from_web, read_from_cache, write_to_cache, downloaded_urls
     cleaned_url=utilities._clean_for_path(url)
     cleaned_url_minus_goog_redirect_prefix=re.compile(r'^http-www.google.comurlq').sub('',cleaned_url)  # if link is a Google redirect link, remove the Google prefix part.  note that the '&usg=' part remains.
     if read_from_cache or write_to_cache:
@@ -56,7 +51,7 @@ def get(url,read_from_cache=True,write_to_cache=True):
         html=open(html_cache_path).read()
         resolved_url=open(resolved_url_cache_path).read()
     else:
-        if OFFLINE:
+        if not download_from_web:
             raise Exception('Cached file not present', 'We are doing an offline, cache-only processing job. If there is no file here it probably just means in the original scrape this request 404\'ed or something.')
         if read_from_cache:
             print 'cache miss    '+url
@@ -64,8 +59,8 @@ def get(url,read_from_cache=True,write_to_cache=True):
         html=f.read()
         resolved_url = f.geturl()
         # the call to got_url is after urlopen() and f.read() so that it won't be called if there is a 404 or other error on reading.  
-        #print "hello philipp!"
-        #print html
+        # print "hello philipp!"
+        # print html
         got_url(url)
         if write_to_cache:
             html_cache=open(html_cache_path,'w')
@@ -124,11 +119,11 @@ def get_itemprop_soup_l(soup,recur=False):
 def get_itemprop_content(soup,itemprop_name,recur=False):
     return get_itemprop_soup(soup,itemprop_name,recur)['content']
 
-def scrape_detail(url,use_cache=True):   
+def scrape_detail(url):   
     app={} 
     app['email_contacts']=[]
     app['logos']=[]
-    page, resolved_url = get(url,use_cache)
+    page, resolved_url = get(url)
     soup = BeautifulSoup.BeautifulSoup(page, fromEncoding='utf-8')
 
     app_info_list_entity=soup.find(None,itemtype="http://schema.org/MobileSoftwareApplication")
@@ -158,7 +153,6 @@ def scrape_detail(url,use_cache=True):
 
     rating=get_itemprop_content(app_info_list_entity,'ratingValue',True) 
     app['rating']= rating
-
     try:
         rating_count=get_itemprop_soup(app_info_list_entity,'ratingCount',True) 
         app['rating_count']= rating_count.text
@@ -211,7 +205,6 @@ def scrape_detail(url,use_cache=True):
     except:
         pass
     return app
-
 
 def get_emails(txt):
     email_re='[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}'
@@ -285,6 +278,7 @@ def scrape_dev_homesite(u,allowable_recursion_depth=1):
              utilities.merge_dicts_add_values(app,app_from_contact_page)
     return app
 
+#normally the use of the cache is in the OFFLINE global variable
 def extract_app(detail_u):
     app={}
     app['unique_package']=get_unique_package(detail_u)
@@ -324,7 +318,7 @@ def extract_and_populate_app(detail_u,scrape_timestamp,extraction_timestamp,cate
     return app
 
 def scrape_category_top_ranked(first_page,last_page,category_scraped,is_paid,scrape_timestamp,extraction_timestamp):
-    global scraped_app_l
+    scraped_app_l=[]
     for i in range(first_page,last_page+1):
         print "page #"+str(i)
         print len(scraped_app_l)
@@ -343,8 +337,15 @@ def scrape_category_top_ranked(first_page,last_page,category_scraped,is_paid,scr
 def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, scrape_date, extraction_date, offline=False,starting_page=0, ending_page=40):
     start_time=datetime.datetime.now()
     print 'scrape start time:'+str(start_time)
-    set_globals(html_cache_path,resolved_urls_cache_path,offline)
-    
+    if offline:
+        _download_from_web=False
+        _read_from_cache=True
+        _write_to_cache=False
+    else:
+        _download_from_web=True
+        _read_from_cache=True
+        _write_to_cache=True
+    initialize_globals(html_cache_path,resolved_urls_cache_path,_download_from_web=_download_from_web,_read_from_cache=_read_from_cache,_write_to_cache=_write_to_cache)
     scrape_timestamp=int(time.mktime(scrape_date.timetuple()) * 1000)  
     extraction_timestamp=int(time.mktime(extraction_date.timetuple()) * 1000)
     if offline:
@@ -366,12 +367,13 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
         app_l[n]['market_rank']=n
     
     # do something with the list of apps here.  for example, persist them.
-    #from android_market_data import db   
-    #reload(db)
-    #db.persist_apps(app_l)
-        
+    from appbackr_android_market_data import db
+    reload(db)
+    db.persist_apps(app_l)
+    print '<here is where apps would be persisted>' # comment this out if you are persisting your apps here
+    
     if len(app_l)>0:
-        print 'timestamp of this scrape: '+str(app_l[0]['scrape_timestamp'])
+        print 'scrape timestamp: '+str(app_l[0]['scrape_timestamp'])
         print 'count of applications loaded into database: '+str(len(app_l))
     else:
         print 'ERROR (or unexpected):   Results count is zero!'
@@ -380,16 +382,12 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     print 'scrape end time:  '+str(end_time)
     print 'elapsed time:     '+str(end_time-start_time)
 
-def set_globals(html_cache_path, resolved_urls_cache_path, offline ):
-    global ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML
-    global ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS
-    global OFFLINE 
-    global downloaded_urls
-    global scraped_app_l
-
-    ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML=html_cache_path
-    ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS=resolved_urls_cache_path
-    OFFLINE=offline
+def initialize_globals(_html_cache_path, _resolved_urls_cache_path, _download_from_web, _read_from_cache, _write_to_cache ):
+    global ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML, ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS, downloaded_urls, download_from_web, read_from_cache, write_to_cache
+    ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML=_html_cache_path
+    ANDROID_MARKET_SCRAPE_CACHE_FOR_RESOLVED_URLS=_resolved_urls_cache_path
+    download_from_web=_download_from_web
+    read_from_cache=_read_from_cache
+    write_to_cache=_write_to_cache
     downloaded_urls=[]
-    scraped_app_l=[]
 
