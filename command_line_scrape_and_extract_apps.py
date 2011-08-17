@@ -89,7 +89,6 @@ if __name__ == "__main__":
     try:
         log_path=utilities.make_new_dated_path('../cache/scrape_'+paid_or_free+'_','.log',extraction_date)
         log_file=open(log_path,'w')
-        #log_file=sys.stdout
         print "log file: "+str(log_file)
         print "now logging to that file"
         sys.stdout=log_file
@@ -122,8 +121,9 @@ if __name__ == "__main__":
             print 'log_file is a :'
             print type(log_file)
             print log_file
-            if os.path.isfile(log_file):
+            if type(log_file)==file:
+                print 'closing log file'
                 log_file.close()
         except:
-            print 'it appears we were logging to stdout. no need to close the log file.'
+            print 'it appears we were logging to stdout. no need to close any log file.'
     print 'finished with scrape and closed log file, if any.'
