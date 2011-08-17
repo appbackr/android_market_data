@@ -363,9 +363,9 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
         app_l[n]['market_rank']=n
     
     # do something with the list of apps here.  for example, persist them.
-    from appbackr_android_market_data import db
-    reload(db)
-    db.persist_apps(app_l)
+    #from appbackr_android_market_data import db
+    #reload(db)
+    #db.persist_apps(app_l)
     print '<here is where apps would be persisted>' # comment this out if you are persisting your apps here
     
     if len(app_l)>0:
