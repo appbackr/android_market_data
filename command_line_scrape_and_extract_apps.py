@@ -48,6 +48,8 @@ if __name__ == "__main__":
     reload(scrape_and_extract_apps)
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
+    start_time=datetime.datetime.now()
+    print 'time is: '+str(start_time)
     print 'extraction_date: '+str(extraction_date)
     print 'extraction_date converted to a timestamp: '+str(int(time.mktime(extraction_date.timetuple())*1000)) # int(time.mktime((datetime.datetime(2011,6,27,0,0,1)).timetuple())*1000)
     print
@@ -127,3 +129,8 @@ if __name__ == "__main__":
         except:
             print 'it appears we were logging to stdout. no need to close any log file.'
     print 'finished with scrape and closed log file, if any.'
+    end_time=datetime.datetime.now()
+    print 'scrape time:'+str(start_time)
+    print 'scrape end time:  '+str(end_time)
+    print 'elapsed time:     '+str(end_time-start_time)
+
