@@ -11,6 +11,7 @@ from android_market_data import scrape_and_extract_apps
 android_market_data.scrape_and_extract_apps.extract_app('https://market.android.com/details?id=com.halfbrick.fruitninja')  
 This will return a dict holding nearly all the data available on that page.  For the return value of that call, see the example_app_data.py file  Currently we're getting most of the data available for an app from its detail page, and making some effort to get email address, twitter handles and contact page urls from the app developer's listed homepage.  
 
+<expect docs on getting app reviews soon>
 
 Who is using it?
 ------------
