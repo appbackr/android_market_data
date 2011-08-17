@@ -1,4 +1,10 @@
-{'application_name': u'Fruit Ninja',
+# this code:
+from android_market_data import scrape_and_extract_apps
+scrape_and_extract_apps.extract_app('https://market.android.com/details?id=com.halfbrick.fruitninja')
+# returned the following dict, as of August 17, 2011: 
+
+{
+'application_name': u'Fruit Ninja',
  'application_updated': u'February 1, 2011',
  'category': u'Arcade &amp; Action',
  'content_rating': u'Everyone',
