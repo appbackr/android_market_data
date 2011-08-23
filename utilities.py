@@ -1,4 +1,5 @@
-import unicodedata, re, os.path, urlparse
+import unicodedata, re, os.path, urlparse, sys
+sys.setdefaultencoding('utf-8')
 # utilities
 
 # very shaky, needs refactor.  Consider making FP.
@@ -48,6 +49,7 @@ def duplicates(l):
             found.add(item)
     return duplicates
 
+#rename map_dict_values
 def map_all_dict_values(f,d):
     for k in d.keys():
         d[k]=f(d[k])
