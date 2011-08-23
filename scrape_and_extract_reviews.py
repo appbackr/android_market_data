@@ -1,19 +1,24 @@
-#android_reviews
+#scrape_and_extract_reviews
+import sys
 sys.path.append('../')
+sys.path.append('/Users/herdrick/shadow-dropbox/python/envs/appbackr_data_science/')
+print sys.path
+import sys
 reload(sys)
 import httplib,urllib,urllib2,re,json,datetime, os,time, BeautifulSoup, functools, sys, traceback
 
 from android_market_data import utilities
 reload(utilities)
-from android_market_data import db   # only needed for db.get_all_unique_packages()  and db.persist_reviews()
+from appbackr_android_market_data import db   # only needed for db.get_all_unique_packages()  and db.persist_reviews()
 reload(db)
 
 global downloaded_urls
 global ANDROID_MARKET_REVIEWS_SCRAPE_CACHE_FOR_JSON
 global ANDROID_MARKET_REVIEWS_SCRAPE_CACHE_FOR_RESOLVED_URLS
 global OFFLINE
+global NO_CACHE
 
-def set_globals(json_text_cache_path, resolved_urls_cache_path,offline ):
+def set_globals(json_text_cache_path, resolved_urls_cache_path,offline, no_cache ):
     global ANDROID_MARKET_REVIEWS_SCRAPE_CACHE_FOR_JSON
     ANDROID_MARKET_REVIEWS_SCRAPE_CACHE_FOR_JSON=json_text_cache_path
     global ANDROID_MARKET_REVIEWS_SCRAPE_CACHE_FOR_RESOLVED_URLS
@@ -22,6 +27,8 @@ def set_globals(json_text_cache_path, resolved_urls_cache_path,offline ):
     downloaded_urls=[]
     global OFFLINE
     OFFLINE=offline
+    global NO_CACHE
+    NO_CACHE=no_cache
 
 def got_url(url):
     if url in downloaded_urls:
@@ -30,9 +37,9 @@ def got_url(url):
 
 # caching here is based entirely on the host, path, and querystring.  keying on params also, i.e. post data, would be doable, but i don't need it now. 
 def post(connection_maker, host, path,querystring, params,accept="text/html"):
-    download_from_web=not OFFLINE
-    read_from_cache=True
-    write_to_cache=True
+    download_from_web=True   #not OFFLINE
+    read_from_cache=False
+    write_to_cache=False
     params_s=urllib.urlencode(params)
     url=querystring
     cleaned_url=utilities._clean_for_path_improved(url)
@@ -94,8 +101,6 @@ def extract_reviews(reviews_html,country_code,language_code):
 
 def extract_review(review_soup,country_code,language_code):
     try:
-        #print 'in extract_review'
-        #print review_soup
         #r_t=review_soup.find('div',attrs={'class':"ratings goog-inline-block", 'title':re.compile(':\s+[0-9.,]+?\s')})   #this works for English and German
         r_t=review_soup.find('div',attrs={'class':"ratings goog-inline-block"})  
         #r_t=review_soup.find('div',title=re.compile('Rating: .*? stars'))
@@ -111,21 +116,18 @@ def extract_review(review_soup,country_code,language_code):
         rating=rating_s.replace(',','.')
         #print 'rating'
         #print rating
-        foo=BeautifulSoup.BeautifulSoup(review_soup.find('span',attrs={'class':'doc-review-date'}).contents[0], convertEntities=BeautifulSoup.BeautifulSoup.HTML_ENTITIES).text
+        foo=BeautifulSoup.BeautifulSoup(review_soup.find('span',attrs={'class':'doc-review-date'}).contents[0], convertEntities=BeautifulSoup.BeautifulSoup.HTML_ENTITIES,fromEncoding="utf-8").text
         #print 'foo'
         #print foo
 
-        #next three lines work for English:
-        #m2=re.match('.*?([A-Z]\w+ \d+, \d+)', foo)  
-        #dt=datetime.datetime.strptime(str(m2.group(1)), '%B %d, %Y')
-        #review_timestamp=int(time.mktime(dt.timetuple())) * 1000
-
-        review_date_string=foo  #leaving silly 'foo' name in place because of above archived code block
-        #print 'review_date_string'
-        #print review_date_string
+        # the next three lines work for English:
+        m2=re.match('.*?([A-Z]\w+ \d+, \d+)', foo)  
+        dt=datetime.datetime.strptime(str(m2.group(1)), '%B %d, %Y')
+        review_timestamp=int(time.mktime(dt.timetuple())) * 1000
+        review_date_string=foo  #leaving silly 'foo' name in place because of above archived code block below "the next three lines work for English"
         
         # there is only a <p> tag when the review prose is long.  Otherwise the summary is the only way to get the prose.
-        if review_soup.p:
+        if review_soup.p and review_soup.p.text!='':
             prose=review_soup.p.text
         else:
             prose=review_soup.h4.text
@@ -138,7 +140,7 @@ def extract_review(review_soup,country_code,language_code):
         print 'exception in extract_review().  ' +str(e)  + " e args="+str(e.args)+'   review_soup= '+str(review_soup)
         traceback.print_exc()        
         return None
-    return {'rating':rating,'review_timestamp':None,'review_date_string':review_date_string,'prose':prose,'reviewer':reviewer}
+    return {'rating':rating,'review_timestamp':review_timestamp,'review_date_string':review_date_string,'prose':prose,'reviewer':reviewer}
 
 def get_reviews(country_code,language_code,scrape_timestamp,unique_package):
     print 'app: '+unique_package
@@ -161,19 +163,22 @@ def get_reviews(country_code,language_code,scrape_timestamp,unique_package):
     return all_reviews
 
 #ANALYTICS:
-def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_path, resolved_urls_cache_path, now, offline=False):
-    set_globals(json_text_cache_path,resolved_urls_cache_path,offline)
+def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_path, resolved_urls_cache_path, now, offline=False, no_cache=False):
+    set_globals(json_text_cache_path,resolved_urls_cache_path,offline,no_cache)
     scrape_timestamp=int(time.mktime(now.timetuple()) * 1000)
     print 'scrape_timestamp:' + str(scrape_timestamp)
     print 'json cache dir: '+json_text_cache_path
     print 'resolved_urls_cache dir: '+resolved_urls_cache_path
     #return map(lambda app_reviews: app_reviews['unique_package']=  map(get_reviews, unique_package_l))
+
+    
+
     for unique_package in unique_package_l:
         reviews=get_reviews(country_code,language_code,scrape_timestamp,unique_package)
         if reviews:
             print 'scrape_timestamp of this scrape/processing: '+str(scrape_timestamp)
             print 'count of applications to be loaded into database: '+str(len(reviews))
-            db.persist_reviews(reviews)
+            db.persist_reviews(reviews, 'staging')
         else:
             print 'found a None reviews.  unique_package='+str(unique_package) 
     print 'inhale reviews finished.'
@@ -183,7 +188,7 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
 # how i'm currently using this:
 #>>> import android_reviews
 #>>> android_reviews.scrape_and_process_reviews()
-def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None):
+def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None, no_cache=False):
     try:
         if not unique_package_l:
             print 'getting all unique_package values from db'
@@ -191,37 +196,38 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
         print 'unique_package_l count: '+str(len(unique_package_l))
         if not now:
             now=datetime.datetime.now()
-        if json_cache_path=='new':
-            json_cache_path=utilities.make_new_dated_path('../cache/reviews/json_','/',now)
-            print "json cache in:"+json_cache_path
-            os.mkdir(json_cache_path)
-        else:
-            if not json_cache_path.endswith('/'):
-                json_cache_path+='/'            
-        if resolved_urls_cache_path=='new':
-            resolved_urls_cache_path=utilities.make_new_dated_path('../cache/reviews/resolved_urls_','/',now)
-            print "resolved_urls cache in:"+resolved_urls_cache_path
-            os.mkdir(resolved_urls_cache_path)
-        else:
-            if not resolved_urls_cache_path.endswith('/'):
-                resolved_urls_cache_path+='/'
+        if not no_cache:
+            if json_cache_path=='new':
+                json_cache_path=utilities.make_new_dated_path('../cache/reviews/json_','/',now)
+                print "json cache in:"+json_cache_path
+                os.mkdir(json_cache_path)
+            else:
+                if not json_cache_path.endswith('/'):
+                    json_cache_path+='/'            
+            if resolved_urls_cache_path=='new':
+                resolved_urls_cache_path=utilities.make_new_dated_path('../cache/reviews/resolved_urls_','/',now)
+                print "resolved_urls cache in:"+resolved_urls_cache_path
+                os.mkdir(resolved_urls_cache_path)
+            else:
+                if not resolved_urls_cache_path.endswith('/'):
+                    resolved_urls_cache_path+='/'
         print 'now:' + str(now)
         timestamp=int(time.mktime(now.timetuple()) * 1000)
         print 'timestamp:' + str(timestamp)
         print 'json cache dir: '+json_cache_path
         print 'resolved_urls_cache dir: '+resolved_urls_cache_path
-        log_path=utilities.make_new_dated_path('../cache/reviews/scrape_and_process_reviews_','.log',now)
+        log_path=utilities.make_new_dated_path('../../cache/reviews/scrape_and_process_reviews_','.log',now)
         log_file=open(log_path,'w')
         print "log file: "+str(log_file)
         print "now logging to that file"
-        sys.stdout=log_file
-        sys.stderr=log_file
+        #sys.stdout=log_file
+        #sys.stderr=log_file
         print "now logging to file"
         print "sys.stdout: "+str(sys.stdout)
         print 'timestamp:' + str(timestamp)
         print 'json cache dir: '+json_cache_path
         print 'resolved_urls_cache dir: '+resolved_urls_cache_path
-        inhale_reviews(country_code,language_code,unique_package_l, json_cache_path, resolved_urls_cache_path,now)
+        inhale_reviews(country_code,language_code,unique_package_l, json_cache_path, resolved_urls_cache_path,now,no_cache=no_cache)
         print 'done with inhale_reviews'
     except Exception as e:
         print 'exception broken out to top level of scrape_and_process_reviews'
@@ -230,12 +236,17 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
     sys.stdout=sys.__stdout__
     sys.stderr=sys.__stderr__
     try:
-        if str(type(log_file))=="<type 'file'>":
-            print 'closing file'
+        print 'log_file is a :'
+        print type(log_file)
+        print log_file
+        if type(log_file)==file:
+            print 'closing log file'
             log_file.close()
-            print 'file closed'
+        else:
+            print 'no file used in logging.'
     except:
-        print 'cant close the file... wtf   >:( '
-        print e
-        traceback.print_exc()
+        print 'it appears we were logging to stdout. no need to close any log file.'
     print 'done with scrape'
+
+
+
