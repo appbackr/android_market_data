@@ -52,7 +52,7 @@ def get(url):
         resolved_url=open(resolved_url_cache_path).read()
     else:
         if not download_from_web:
-            raise Exception('Cached file not present', 'We are doing an offline, cache-only processing job. If there is no file here it probably just means in the original scrape this request 404\'ed or something.')
+            raise Exception('Cached file not present', 'We are doing an offline, cache-only processing job. If there is no file here it probably just means in the original scrape this request 404\'ed or something.  Expected file in '+html_cache_path+'    and '+ resolved_url_cache_path)
         if read_from_cache:
             print 'cache miss    '+url
         f = urllib2.urlopen(url,timeout=10)
@@ -370,7 +370,7 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     
     if len(app_l)>0:
         print 'scrape timestamp: '+str(app_l[0]['scrape_timestamp'])
-        print 'count of applications loaded into database: '+str(len(app_l))
+        print 'count of applications extracted  '+str(len(app_l))
     else:
         print 'ERROR (or unexpected):   Results count is zero!'
     end_time=datetime.datetime.now()
