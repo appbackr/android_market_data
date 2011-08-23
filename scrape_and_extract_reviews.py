@@ -163,7 +163,7 @@ def get_reviews(country_code,language_code,scrape_timestamp,unique_package):
     return all_reviews
 
 #ANALYTICS:
-def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_path, resolved_urls_cache_path, now, offline=False, no_cache=False):
+def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_path, resolved_urls_cache_path, now, offline=False, no_cache=False,database='archive'):
     set_globals(json_text_cache_path,resolved_urls_cache_path,offline,no_cache)
     scrape_timestamp=int(time.mktime(now.timetuple()) * 1000)
     print 'scrape_timestamp:' + str(scrape_timestamp)
@@ -178,7 +178,7 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
         if reviews:
             print 'scrape_timestamp of this scrape/processing: '+str(scrape_timestamp)
             print 'count of applications to be loaded into database: '+str(len(reviews))
-            db.persist_reviews(reviews, 'staging')
+            db.persist_reviews(reviews, database)
         else:
             print 'found a None reviews.  unique_package='+str(unique_package) 
     print 'inhale reviews finished.'
@@ -188,7 +188,7 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
 # how i'm currently using this:
 #>>> import android_reviews
 #>>> android_reviews.scrape_and_process_reviews()
-def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None, no_cache=False):
+def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None, no_cache=False,database='archive'):
     try:
         if not unique_package_l:
             print 'getting all unique_package values from db'
@@ -227,7 +227,7 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
         print 'timestamp:' + str(timestamp)
         print 'json cache dir: '+json_cache_path
         print 'resolved_urls_cache dir: '+resolved_urls_cache_path
-        inhale_reviews(country_code,language_code,unique_package_l, json_cache_path, resolved_urls_cache_path,now,no_cache=no_cache)
+        inhale_reviews(country_code,language_code,unique_package_l, json_cache_path, resolved_urls_cache_path,now,no_cache=no_cache,database=database)
         print 'done with inhale_reviews'
     except Exception as e:
         print 'exception broken out to top level of scrape_and_process_reviews'
