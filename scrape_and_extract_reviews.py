@@ -217,16 +217,16 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
         print 'json cache dir: '+json_cache_path
         print 'resolved_urls_cache dir: '+resolved_urls_cache_path
         log_path=utilities.make_new_dated_path('../../cache/reviews/scrape_and_process_reviews_','.log',now)
-        log_file=open(log_path,'w')
-        print "log file: "+str(log_file)
-        print "now logging to that file"
+        #log_file=open(log_path,'w')
+        #print "log file: "+str(log_file)
+        #print "now logging to that file"
         #sys.stdout=log_file
         #sys.stderr=log_file
-        print "now logging to file"
-        print "sys.stdout: "+str(sys.stdout)
+        #print "now logging to file"
+        #print "sys.stdout: "+str(sys.stdout)
         print 'timestamp:' + str(timestamp)
-        print 'json cache dir: '+json_cache_path
-        print 'resolved_urls_cache dir: '+resolved_urls_cache_path
+        #print 'json cache dir: '+json_cache_path
+        #print 'resolved_urls_cache dir: '+resolved_urls_cache_path
         inhale_reviews(country_code,language_code,unique_package_l, json_cache_path, resolved_urls_cache_path,now,no_cache=no_cache,database=database)
         print 'done with inhale_reviews'
     except Exception as e:
@@ -235,17 +235,17 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
     print 'switching output back to stdout and stderr'
     sys.stdout=sys.__stdout__
     sys.stderr=sys.__stderr__
-    try:
-        print 'log_file is a :'
-        print type(log_file)
-        print log_file
-        if type(log_file)==file:
-            print 'closing log file'
-            log_file.close()
-        else:
-            print 'no file used in logging.'
-    except:
-        print 'it appears we were logging to stdout. no need to close any log file.'
+    #try:
+     #   print 'log_file is a :'
+     #   print type(log_file)
+     #   print log_file
+     #   if type(log_file)==file:
+     #       print 'closing log file'
+     #       log_file.close()
+     #   else:
+     #       print 'no file used in logging.'
+    #except:
+     #   print 'it appears we were logging to stdout. no need to close any log file.'
     print 'done with scrape'
 
 
