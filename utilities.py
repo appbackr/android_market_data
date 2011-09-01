@@ -1,5 +1,4 @@
 import unicodedata, re, os.path, urlparse, sys
-sys.setdefaultencoding('utf-8')
 # utilities
 
 # very shaky, needs refactor.  Consider making FP.
