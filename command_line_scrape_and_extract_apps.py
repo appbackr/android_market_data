@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # command_line_scrape_and_extract_apps.py
 import sys
+reload(sys)
 sys.setdefaultencoding('utf-8')
 if __name__ == "__main__":
     import sys
