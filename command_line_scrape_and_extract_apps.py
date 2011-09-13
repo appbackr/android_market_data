@@ -19,10 +19,6 @@ if __name__ == "__main__":
     resolved_urls_cache_path=sys.argv[arg_pos]
     arg_pos+=1
     scrape_timestamp_s=sys.argv[arg_pos]
-    arg_pos+=1
-    starting_page=sys.argv[arg_pos]
-    arg_pos+=1
-    ending_page=sys.argv[arg_pos]
     print 'working_dir: '+working_dir
     print 'category: ' +category
     print 'paid_or_free: ' +paid_or_free
@@ -30,8 +26,6 @@ if __name__ == "__main__":
     print 'html_cache_path: ' +html_cache_path
     print 'resolved_urls_cache_path: ' +resolved_urls_cache_path
     print 'scrape_timestamp_s: '+scrape_timestamp_s
-    print 'starting_page: ' +starting_page
-    print 'ending_page: '+ending_page 
     print
     print 'now starting scrape'
     import os

@@ -315,9 +315,12 @@ def extract_and_populate_app(detail_u,scrape_timestamp,extraction_timestamp,cate
     #app['paid']=is_paid
     return app
 
-def scrape_category_top_ranked(first_page,last_page,category_scraped,is_paid,scrape_timestamp,extraction_timestamp):
+
+def scrape_category_top_ranked(category_scraped,is_paid,scrape_timestamp,extraction_timestamp):
     scraped_app_l=[]
-    for i in range(first_page,last_page+1):
+    count=None
+    i=0
+    while count>0 or count is None:
         print "page #"+str(i)
         print len(scraped_app_l)
         summaries=scrape_top('https://market.android.com/details?id=apps_topselling_'+ ('paid' if is_paid else 'free') +'&cat='+category_scraped+'&start='+str(i*24)+'&num=24')
@@ -326,13 +329,15 @@ def scrape_category_top_ranked(first_page,last_page,category_scraped,is_paid,scr
             detail_u=get_detail_url_absolute(summary)
             app=extract_and_populate_app(detail_u,scrape_timestamp,extraction_timestamp,category_scraped)
             scraped_app_l.append(app)
+        i+=1
+        count=len(summaries)
     return scraped_app_l
 
 # this scrapes, ranks, and inserts into the database
 # note that category can also be a subcategory / subgenre.  In fact I'm not positive that the Android market has any sort of hierarchical idea of categories. That may just be tacked onto the web UI.
 # example: inhale_market_data('GAME',True,'/Users/herdrick/Dropbox/python/appbackr/cache/html_new/','/Users/herdrick/Dropbox/python/appbackr/cache/resolved_urls_new/')
 # example: inhale_market_data('PUZZLE',False,'/Users/herdrick/Dropbox/python/appbackr/cache/html_new/','/Users/herdrick/Dropbox/python/appbackr/cache/resolved_urls_new/')
-def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, scrape_date, extraction_date, offline=False,starting_page=0, ending_page=40):
+def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, scrape_date, extraction_date, offline=False):
     start_time=datetime.datetime.now()
     print 'scrape start time:'+str(start_time)
     if offline:
@@ -355,7 +360,7 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
 
     print 'html cache dir: '+html_cache_path
     print 'resolved_urls_cache dir: '+resolved_urls_cache_path
-    app_l=scrape_category_top_ranked(starting_page,ending_page,category,paid,scrape_timestamp,extraction_timestamp) 
+    app_l=scrape_category_top_ranked(category,paid,scrape_timestamp,extraction_timestamp) 
     # assign Android Market ranks,  we got them in order; use that order.
     for n in range(len(app_l)):
         app_l[n]['market_rank']=n
