@@ -1,10 +1,7 @@
 #! /usr/bin/env python
-# scrape_and_extract_apps.py
-# script to scrape
-# usage from command line - obsolete:
-# > ./scrape_android_market_phase_1A.py NEWS_AND_MAGAZINES PAID /Users/herdrick/shadow-dropbox/python/appbackr/cache/html_testing/ /Users/herdrick/shadow-dropbox/python/appbackr/cache/resolved_urls_testing/ ONLINE 0 1
-# > ./scrape_android_market_phase_1A.py all PAID /Users/herdrick/shadow-dropbox/python/appbackr/cache/html_testing/ /Users/herdrick/shadow-dropbox/python/appbackr/cache/resolved_urls_testing/ ONLINE 0 1
-# if 'all' is specified in place of a catagory (like GAME or NEWS_AND_MAGAZINES), then 'https://market.android.com/apps/GAME' will be scraped to get all the app categories from the left sidebar.  each category will be scraped.
+# command_line_scrape_and_extract_apps.py
+import sys
+sys.setdefaultencoding('utf-8')
 if __name__ == "__main__":
     import sys
     arg_pos=0
@@ -46,6 +43,7 @@ if __name__ == "__main__":
     reload(utilities)
     from android_market_data import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
+    from android_market_data import analysis
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     start_time=datetime.datetime.now()
@@ -56,7 +54,8 @@ if __name__ == "__main__":
     if offline:
         print '--OFFLINE SCRAPE-- '
         print
-        scrape_date=datetime.datetime.fromtimestamp(int(scrape_timestamp_s)/1000)
+        scrape_timestamp=int(scrape_timestamp_s)
+        scrape_date=datetime.datetime.fromtimestamp(scrape_timestamp/1000)
         if not html_cache_path.endswith('/'):
             html_cache_path+='/'            
         if not resolved_urls_cache_path.endswith('/'):
@@ -66,6 +65,7 @@ if __name__ == "__main__":
         print
         if scrape_timestamp_s=='new':
             scrape_date=extraction_date
+            scrape_timestamp=(int(time.mktime(scrape_date.timetuple())*1000))
         else:
             print 'PROBLEM: this is an online scrape yet the scrape_timestamp was specified.  Bad.'
             raise Exception('PROBLEM: this is an online scrape yet the scrape_timestamp was specified.  Bad.')            
@@ -118,6 +118,11 @@ if __name__ == "__main__":
         sys.stdout=sys.__stdout__
         sys.stderr=sys.__stderr__
         print 'finished with scrape.'
+        print 'now filling in calculated values in rows'
+        analysis.fill_in_calculated_values(scrape_timestamp,cats)
+        print 'finished with filling in calculated values.'
+        print 'scrape and fill in is finished'
+        
     finally:
         try:
             print 'log_file is a :'
@@ -133,4 +138,7 @@ if __name__ == "__main__":
     print 'scrape time:'+str(start_time)
     print 'scrape end time:  '+str(end_time)
     print 'elapsed time:     '+str(end_time-start_time)
+
+
+
 

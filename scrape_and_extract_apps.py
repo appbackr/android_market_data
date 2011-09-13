@@ -2,12 +2,10 @@
 # scrape_and_extract_apps
 import sys
 sys.path.append('../')
-reload(sys)
 from android_market_data import utilities
 reload(utilities)
 
-sys.setdefaultencoding('utf-8')
-reload(sys)
+
 import urllib2, BeautifulSoup, re, urlparse,  datetime, traceback, time, os
 
 ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML='../cache/dummy_html/' 
