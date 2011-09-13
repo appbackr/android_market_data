@@ -107,9 +107,9 @@ if __name__ == "__main__":
                 cats=scrape_and_extract_apps.get_categories()
             else:  
                 cats=[category]
-            print 'categories.  (count: '+str(len(cats))+') '+str(cats)
+            print 'categories:  (count: '+str(len(cats))+') '+str(cats)
             for cat in cats:
-                scrape_and_extract_apps.inhale_market_data(category=cat,paid=(pay_type.lower()=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),ending_page=int(ending_page))
+                scrape_and_extract_apps.inhale_market_data(category=cat,paid=(pay_type.lower()=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'))
         sys.stdout=sys.__stdout__
         sys.stderr=sys.__stderr__
         print 'finished with scrape.'
