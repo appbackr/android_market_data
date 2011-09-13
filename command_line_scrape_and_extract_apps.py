@@ -38,7 +38,7 @@ if __name__ == "__main__":
     reload(utilities)
     from android_market_data import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
-    from android_market_data import analysis
+    from appbackr_android_market_data import analysis
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     start_time=datetime.datetime.now()
