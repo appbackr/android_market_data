@@ -119,7 +119,7 @@ if __name__ == "__main__":
         sys.stderr=sys.__stderr__
         print 'finished with scrape.'
         print 'now filling in calculated values in rows'
-        analysis.fill_in_calculated_values(scrape_timestamp,cats)
+        analysis.fill_in_calculated_values(scrape_timestamp)
         print 'finished with filling in calculated values.'
         print 'scrape and fill in is finished'
         
@@ -138,7 +138,6 @@ if __name__ == "__main__":
     print 'scrape time:'+str(start_time)
     print 'scrape end time:  '+str(end_time)
     print 'elapsed time:     '+str(end_time-start_time)
-
 
 
 
