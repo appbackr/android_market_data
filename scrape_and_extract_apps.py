@@ -71,7 +71,7 @@ def get(url):
 #todo:  really should put the recursive 'try again' thing here into get() instead, except with the default being attempts_remaining=0.  the thing about that is that 
 #then you'd throw the exception when you've run out of attempts, which I'd then have to catch and ignore here.  but honestly, it would be really valuable in 
 #other places in the code
-def scrape_top(url, attempts_remaining=5, seconds_between_attempts=20): 
+def scrape_top(url, attempts_remaining=2, seconds_between_attempts=5): 
     print 'scrape top ' + url
     rez=[]
     try:
