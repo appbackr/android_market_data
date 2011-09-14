@@ -182,6 +182,20 @@ def make_new_dated_path(base_path,suffix,now,hours=False,minutes=False,seconds=F
 
 #end filesystem utils
 
+# usage:
+#import sys
+#sys.stdout=Unbuffered(sys.stdout)
+#print 'Hello'
+class Unbuffered:
+     def __init__(self, stream):
+         self.stream = stream
+     def write(self, data):
+         self.stream.write(data)
+         self.stream.flush()
+     def __getattr__(self, attr):
+         return getattr(self.stream, attr)
+
+
 # Crappy / weird / one-off functions:
 
 def dict_of_empties(d):
