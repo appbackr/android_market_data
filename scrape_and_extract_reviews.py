@@ -233,8 +233,8 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
         print 'exception broken out to top level of scrape_and_process_reviews'
         traceback.print_exc()
     print 'switching output back to stdout and stderr'
-    sys.stdout=sys.__stdout__
-    sys.stderr=sys.__stderr__
+    #sys.stdout=sys.__stdout__
+    #sys.stderr=sys.__stderr__
     #try:
      #   print 'log_file is a :'
      #   print type(log_file)

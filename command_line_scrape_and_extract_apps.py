@@ -88,13 +88,12 @@ if __name__ == "__main__":
         log_file=open(log_path,'w')
         print "log file: "+str(log_file)
         print "now logging to that file"
-        sys.stdout=log_file
-        sys.stderr=log_file
+        #sys.stdout=log_file
+        #sys.stderr=log_file
         print "now logging to file"
         print 'making stdout and stderr unbuffered (actually buffered only per call to write())'
-        sys.stdout=utilities.Unbuffered(sys.stdout)
-        sys.stderr =utilities.Unbuffered(sys.stderr)
-
+        #sys.stdout=utilities.Unbuffered(sys.stdout)
+        #sys.stderr =utilities.Unbuffered(sys.stderr)
 
         #need to call set_globals here only because the call to get_categories needs them.  it's clumsy doing this here, and later on in inhale_market_data too.     
         #set_globals(html_cache_path,resolved_urls_cache_path,offline)
@@ -129,6 +128,7 @@ if __name__ == "__main__":
             print log_file
             if type(log_file)==file:
                 print 'closing log file'
+                log_file.flush()
                 log_file.close()
         except:
             print 'it appears we were logging to stdout. no need to close any log file.'
