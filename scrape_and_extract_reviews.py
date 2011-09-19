@@ -1,7 +1,7 @@
 #scrape_and_extract_reviews
 import sys
 sys.path.append('../')
-sys.path.append('/Users/herdrick/shadow-dropbox/python/envs/appbackr_data_science/')
+sys.path.append('/Users/herdrick/appbackr/appbackr_data_science/')
 print sys.path
 import sys
 reload(sys)
@@ -79,9 +79,10 @@ def post(connection_maker, host, path,querystring, params,accept="text/html"):
     return json_text
 
 
-def get_reviews_json(country_code,language_code,unique_package,page=0):
+def get_reviews_json(country_code,language_code,unique_package,page=0,reviewType=0,reviewSortOrder=0):
     params = {'xhr':1}
-    reviews_s=post(httplib.HTTPSConnection, "market.android.com", '/getreviews','id='+unique_package+'&reviewType=0&pageNum='+str(page)+'&hl='+language_code+'&gl='+country_code,params,accept="text/plain")
+    reviews_s=post(httplib.HTTPSConnection, "market.android.com", '/getreviews','id='+unique_package+'&reviewType='+str(reviewType)+'&reviewSortOrder='+str(reviewSortOrder)+'&pageNum='+str(page)+'&hl='+language_code+'&gl='+country_code,params,accept="text/plain")
+    #print reviews_s
     regex=re.compile('.*?("htmlContent".*)',re.DOTALL) 
     m=regex.match(reviews_s)
     json_text='{'+m.group(1)  #matching on "htmlContent" and then adding a { to make this is json object is odd, but it's much less brittle than the usual alternative. 
