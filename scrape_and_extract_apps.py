@@ -320,7 +320,7 @@ def scrape_category_top_ranked(category_scraped,is_paid,scrape_timestamp,extract
     scraped_app_l=[]
     count=None
     i=0
-    while count>0 or count is None:
+    while i<40 and (count>0 or count is None):
         print "page #"+str(i)
         print len(scraped_app_l)
         summaries=scrape_top('https://market.android.com/details?id=apps_topselling_'+ ('paid' if is_paid else 'free') +'&cat='+category_scraped+'&start='+str(i*24)+'&num=24')
