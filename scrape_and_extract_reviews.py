@@ -187,12 +187,12 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
 # this functionality could be in inhale_reviews but I leave it here for symmetry with the scrape_and_extract_apps script, so that an opportunity for shared code here might pop out more visibily.  lol.
 # how i'm currently using this:
 #>>> import android_reviews
-#>>> android_reviews.scrape_and_process_reviews()
+#>>> android_reviews.scrape_and_process_reviews('us','en')
 def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None, no_cache=False,database='archive'):
     try:
         if not unique_package_l:
             print 'getting all unique_package values from db'
-            unique_package_l=db.get_all_unique_packages()
+            unique_package_l=db.get_all_unique_packages('production')
         print 'unique_package_l count: '+str(len(unique_package_l))
         if not now:
             now=datetime.datetime.now()
@@ -203,7 +203,7 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
                 os.mkdir(json_cache_path)
             else:
                 if not json_cache_path.endswith('/'):
-                    json_cache_path+='/'            
+                    json_cache_path+='/'
             if resolved_urls_cache_path=='new':
                 resolved_urls_cache_path=utilities.make_new_dated_path('../cache/reviews/resolved_urls_','/',now)
                 print "resolved_urls cache in:"+resolved_urls_cache_path
