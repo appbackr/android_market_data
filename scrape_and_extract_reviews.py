@@ -1,12 +1,12 @@
 #scrape_and_extract_reviews
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 sys.path.append('../')
 sys.path.append('/Users/herdrick/appbackr/appbackr_data_science/')
 print sys.path
-import sys
-reload(sys)
-import httplib,urllib,urllib2,re,json,datetime, os,time, BeautifulSoup, functools, sys, traceback
 
+import httplib,urllib,urllib2,re,json,datetime, os,time, BeautifulSoup, functools, sys, traceback
 from android_market_data import utilities
 reload(utilities)
 from appbackr_android_market_data import db   # only needed for db.get_all_unique_packages()  and db.persist_reviews()
