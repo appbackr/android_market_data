@@ -248,6 +248,6 @@ def scrape_and_process_reviews(country_code,language_code,unique_package_l=None,
     #except:
      #   print 'it appears we were logging to stdout. no need to close any log file.'
     print 'done with scrape'
-
+    return timestamp
 
 
