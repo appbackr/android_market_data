@@ -178,7 +178,7 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
         reviews=get_reviews(country_code,language_code,scrape_timestamp,unique_package)
         if reviews:
             print 'scrape_timestamp of this scrape/processing: '+str(scrape_timestamp)
-            print 'count of applications to be loaded into database: '+str(len(reviews))
+            print 'count of reviews to be loaded into database: '+str(len(reviews))
             db.persist_reviews(reviews, database)
         else:
             print 'found a None reviews.  unique_package='+str(unique_package) 
