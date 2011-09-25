@@ -21,14 +21,34 @@ if __name__ == "__main__":
     resolved_urls_cache_path=sys.argv[arg_pos]
     arg_pos+=1
     scrape_timestamp_s=sys.argv[arg_pos]
+    arg_pos+=1
+    starting_page=sys.argv[arg_pos]
+    arg_pos+=1
+    max_ending_page=sys.argv[arg_pos]
+    arg_pos+=1
+    profiler_web_server_port=sys.argv[arg_pos]
     print 'working_dir: '+working_dir
     print 'category: ' +category
     print 'paid_or_free: ' +paid_or_free
     print 'offline_or_online: ' +offline_or_online
     print 'html_cache_path: ' +html_cache_path
     print 'resolved_urls_cache_path: ' +resolved_urls_cache_path
+    print 'starting_page: ' +starting_page
+    print 'max_ending_page: '+max_ending_page
     print 'scrape_timestamp_s: '+scrape_timestamp_s
+    print 'profiler_web_server_port: '+profiler_web_server_port
     print
+
+    import cherrypy
+    import dowser
+    cherrypy.config.update({'server.socket_port': int(profiler_web_server_port)})
+    cherrypy.config.update({'server.socket_host': '0.0.0.0'})
+    cherrypy.tree.mount(dowser.Root())
+    cherrypy.engine.autoreload.unsubscribe()
+    ### Windows only                                                                                                                                                                                    
+    ###cherrypy._console_control_handler.unsubscribe()                                                                                                                                                  
+    cherrypy.engine.start()
+
     print 'now starting scrape'
     import os
     os.chdir(working_dir)
@@ -40,6 +60,7 @@ if __name__ == "__main__":
     from android_market_data import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
     from appbackr_android_market_data import analysis
+    from appbackr_android_market_data import db
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     start_time=datetime.datetime.now()
@@ -98,32 +119,30 @@ if __name__ == "__main__":
 
         #need to call set_globals here only because the call to get_categories needs them.  it's clumsy doing this here, and later on in inhale_market_data too.     
         #set_globals(html_cache_path,resolved_urls_cache_path,offline)
-        pay_types=[]
-        if paid_or_free=='all':
-            print 'pay types = all'
-            pay_types=['paid','free']
-        else:
-            print 'paid_or_free is not equal to all:'+paid_or_free
-            pay_types=[paid_or_free]
-        print "pay types"+str(pay_types)
-        for pay_type in pay_types:
-            if category.lower()=='all':
-                cats=scrape_and_extract_apps.get_categories()
-            else:  
-                cats=[category]
-            print 'categories:  (count: '+str(len(cats))+') '+str(cats)
-            for cat in cats:
-                scrape_and_extract_apps.inhale_market_data(category=cat,paid=(pay_type.lower()=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'))
+        paid_or_free=paid_or_free.lower()
+        print 'paid_or_free :'+paid_or_free
+        if category.lower()=='all':
+            cats=scrape_and_extract_apps.get_categories()
+        else:  
+            cats=[category]
+        print 'categories:  (count: '+str(len(cats))+') '+str(cats)
+        for cat in cats:
+            scrape_and_extract_apps.inhale_market_data(category=cat,paid=(paid_or_free=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),max_ending_page=int(max_ending_page))
         sys.stdout=sys.__stdout__
         sys.stderr=sys.__stderr__
         print 'finished with scrape.'
         print 'now filling in calculated values in rows'
         analysis.fill_in_calculated_values(scrape_timestamp)
         print 'finished with filling in calculated values.'
+        print 'there are now '+count+' apps with this scrape_timestamp in the db.'
+        print 'now declaring this was a good scrape.'
+        db.declare_a_good_scrape(scrape_timestamp,paid_or_free)
         print 'scrape and fill in is finished'
         
     finally:
         try:
+            print 'closing things out'
+            cherrypy.engine.exit()
             print 'log_file is a :'
             print type(log_file)
             print log_file
