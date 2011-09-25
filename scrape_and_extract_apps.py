@@ -71,7 +71,7 @@ def get(url):
 #todo:  really should put the recursive 'try again' thing here into get() instead, except with the default being attempts_remaining=0.  the thing about that is that 
 #then you'd throw the exception when you've run out of attempts, which I'd then have to catch and ignore here.  but honestly, it would be really valuable in 
 #other places in the code
-def scrape_top(url, attempts_remaining=5, seconds_between_attempts=20): 
+def scrape_top(url, attempts_remaining=2, seconds_between_attempts=3): 
     print 'scrape top ' + url
     rez=[]
     try:
@@ -318,7 +318,7 @@ def extract_and_populate_app(detail_u,scrape_timestamp,extraction_timestamp,cate
 def scrape_category_top_ranked(first_page,last_page,category_scraped,is_paid,scrape_timestamp,extraction_timestamp):
     scraped_app_l=[]
     for i in range(first_page,last_page+1):
-        print "page #"+str(i)
+        print "page #"+str(i)+"   new code 0"
         print len(scraped_app_l)
         summaries=scrape_top('https://market.android.com/details?id=apps_topselling_'+ ('paid' if is_paid else 'free') +'&cat='+category_scraped+'&start='+str(i*24)+'&num=24')
         print "and now summaries:"
@@ -361,10 +361,11 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
         app_l[n]['market_rank']=n
     
     # do something with the list of apps here.  for example, persist them.
-    #from appbackr_android_market_data import db
-    #reload(db)
-    #db.persist_apps(app_l)
-    print '<here is where apps would be persisted>' # comment this out if you are persisting your apps here
+    from appbackr_android_market_data import db
+    reload(db)
+    db.persist_apps(app_l)
+    print 'persisting apps...'
+    #print '<here is where apps would be persisted>' # comment this out if you are persisting your apps here
     
     if len(app_l)>0:
         print 'scrape timestamp: '+str(app_l[0]['scrape_timestamp'])

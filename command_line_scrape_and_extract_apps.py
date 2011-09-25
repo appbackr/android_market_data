@@ -1,7 +1,12 @@
 #! /usr/bin/env python
 # command_line_scrape_and_extract_apps.py
 import sys
+reload(sys)
+#sys.path.append('.')
+sys.path.append('/Users/herdrick/appbackr/appbackr_data_science/')
 sys.setdefaultencoding('utf-8')
+
+
 if __name__ == "__main__":
     import sys
     arg_pos=0
@@ -23,6 +28,9 @@ if __name__ == "__main__":
     starting_page=sys.argv[arg_pos]
     arg_pos+=1
     ending_page=sys.argv[arg_pos]
+    arg_pos+=1
+    profiler_web_server_port=sys.argv[arg_pos]
+
     print 'working_dir: '+working_dir
     print 'category: ' +category
     print 'paid_or_free: ' +paid_or_free
@@ -33,6 +41,21 @@ if __name__ == "__main__":
     print 'starting_page: ' +starting_page
     print 'ending_page: '+ending_page 
     print
+    #sys.path.append('.') 
+
+
+
+    import cherrypy 
+    import dowser 
+    cherrypy.config.update({'server.socket_port': int(profiler_web_server_port)}) 
+    cherrypy.config.update({'server.socket_host': '0.0.0.0'}) 
+    cherrypy.tree.mount(dowser.Root()) 
+    cherrypy.engine.autoreload.unsubscribe() 
+    ### Windows only 
+    ###cherrypy._console_control_handler.unsubscribe() 
+    cherrypy.engine.start() 
+
+    
     print 'now starting scrape'
     import os
     os.chdir(working_dir)
@@ -43,7 +66,7 @@ if __name__ == "__main__":
     reload(utilities)
     from android_market_data import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
-    from android_market_data import analysis
+    from appbackr_android_market_data import analysis
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     start_time=datetime.datetime.now()
@@ -125,6 +148,8 @@ if __name__ == "__main__":
         
     finally:
         try:
+            print 'closing things out'
+            cherrypy.engine.exit()
             print 'log_file is a :'
             print type(log_file)
             print log_file
