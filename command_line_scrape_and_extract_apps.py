@@ -125,7 +125,7 @@ if __name__ == "__main__":
             cats=scrape_and_extract_apps.get_categories()
         else:  
             cats=[category]
-        print 'categories:  (count: '+str(len(cats))+') '+str(cats)
+        print 'categories count: '+str(len(cats))+'  '+str(cats)
         for cat in cats:
             scrape_and_extract_apps.inhale_market_data(category=cat,paid=(paid_or_free=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),max_ending_page=int(max_ending_page))
         sys.stdout=sys.__stdout__
@@ -134,7 +134,7 @@ if __name__ == "__main__":
         print 'now filling in calculated values in rows'
         analysis.fill_in_calculated_values(scrape_timestamp)
         print 'finished with filling in calculated values.'
-        print 'there are now '+count+' apps with this scrape_timestamp in the db.'
+        #print 'there are now '+count+' apps with this scrape_timestamp in the db.'
         print 'now declaring this was a good scrape.'
         db.declare_a_good_scrape(scrape_timestamp,paid_or_free)
         print 'scrape and fill in is finished'

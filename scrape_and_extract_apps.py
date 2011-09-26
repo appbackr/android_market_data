@@ -160,7 +160,7 @@ def scrape_detail(url):
     price=get_itemprop_soup(app_info_list_entity,'price',True) 
     app['price']= price.text
 
-    updated=get_itemprop_soup(app_info_list_entity,'publishDate',True) 
+    updated=get_itemprop_soup(app_info_list_entity,'datePublished',True) 
     app['application_updated']= updated.text
 
     # for a lot of these values, get_standard_metadatum is still useful!  :)
