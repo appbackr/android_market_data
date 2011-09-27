@@ -136,7 +136,7 @@ if __name__ == "__main__":
         print 'finished with filling in calculated values.'
         #print 'there are now '+count+' apps with this scrape_timestamp in the db.'
         print 'now declaring this was a good scrape.'
-        db.declare_a_good_scrape(scrape_timestamp,paid_or_free)
+        db.record_scrape(scrape_timestamp,paid_or_free)
         print 'scrape and fill in is finished'
         
     finally:
