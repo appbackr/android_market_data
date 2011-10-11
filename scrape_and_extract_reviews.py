@@ -7,9 +7,9 @@ sys.path.append('/Users/herdrick/appbackr/appbackr_data_science/')
 print sys.path
 
 import httplib,urllib,urllib2,re,json,datetime, os,time, BeautifulSoup, functools, sys, traceback
-from android_market_data import utilities
+from common import utilities
 reload(utilities)
-from appbackr_android_market_data import db   # only needed for db.get_all_unique_packages()  and db.persist_reviews()
+from android import db   # only needed for db.get_all_unique_packages()  and db.persist_reviews()
 reload(db)
 
 global downloaded_urls
@@ -189,15 +189,28 @@ def inhale_reviews(country_code,language_code,unique_package_l,json_text_cache_p
 # how i'm currently using this:
 #>>> import android_reviews
 #>>> android_reviews.scrape_and_process_reviews('us','en')
-#from android_market_data import scrape_and_extract_reviews
-#from appbackr_android_market_data import db
-#from appbackr_android_market_data import analysis
+
+
+#from android_market_data_public import scrape_and_extract_reviews
+#from android import db
+#from android import analysis
 #scrape_timestamp=scrape_and_extract_reviews.scrape_and_process_reviews('us','en',no_cache=True,database='archive')
 ###scrape_timestamp=1316476792000L
 #scrapes_that_need_v3=db.get_unique_scrape_timestamps_from_db_without_appbackr_score_v3(latest_timestamp=scrape_timestamp)
 #scrapes_that_need_v3.reverse()
 #print scrapes_that_need_v3
 #map(lambda s: analysis.calculate_and_update_in_db_appbackr_score_v3_all(s,skip_if_already_in_db=True) , scrapes_that_need_v3)
+
+#here's what's running on ec2-107-20-106-112.compute-1.amazonaws.com   on October 3:
+#from android_market_data import scrape_and_extract_reviews
+#from appbackr_android_market_data import db
+#from appbackr_android_market_data import analysis
+#while 1==1:
+#      scrape_timestamp=scrape_and_extract_reviews.scrape_and_process_reviews('us','en',no_cache=True)
+#      scrapes_that_need_v3=db.get_unique_scrape_timestamps_from_db_without_appbackr_score_v3(latest_timestamp=scrape_timestamp)
+#      scrapes_that_need_v3.reverse()
+#      print scrapes_that_need_v3
+#      map(lambda s: analysis.calculate_and_update_in_db_appbackr_score_v3_all(s,skip_if_already_in_db=True) , scrapes_that_need_v3)
 def scrape_and_process_reviews(country_code,language_code,unique_package_l=None, json_cache_path='new',resolved_urls_cache_path='new',now=None, no_cache=False,database='archive'):
     try:
         if not unique_package_l:

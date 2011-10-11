@@ -55,12 +55,12 @@ if __name__ == "__main__":
     sys.path.append(working_dir)
     reload(sys)
     import datetime,time
-    from android_market_data import utilities
+    from common import utilities
     reload(utilities)
-    from android_market_data import scrape_and_extract_apps
+    from android_market_data_public import scrape_and_extract_apps
     reload(scrape_and_extract_apps)
-    from appbackr_android_market_data import analysis
-    from appbackr_android_market_data import db
+    from android import analysis
+    from android import db
     offline=offline_or_online.lower()=='offline'
     extraction_date=datetime.datetime.now()
     start_time=datetime.datetime.now()
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         print 'finished with filling in calculated values.'
         #print 'there are now '+count+' apps with this scrape_timestamp in the db.'
         print 'now declaring this was a good scrape.'
-        db.record_scrape(scrape_timestamp,paid_or_free)
+        db.record_scrape(scrape_timestamp,paid_or_free=paid_or_free)
         print 'scrape and fill in is finished'
         
     finally:
