@@ -128,8 +128,6 @@ if __name__ == "__main__":
         print 'categories count: '+str(len(cats))+'  '+str(cats)
         for cat in cats:
             scrape_and_extract_apps.inhale_market_data(category=cat,paid=(paid_or_free=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),max_ending_page=int(max_ending_page))
-        sys.stdout=sys.__stdout__
-        sys.stderr=sys.__stderr__
         print 'finished with scrape.'
         print 'now filling in calculated values in rows'
         analysis.fill_in_calculated_values(scrape_timestamp)
@@ -137,8 +135,7 @@ if __name__ == "__main__":
         #print 'there are now '+count+' apps with this scrape_timestamp in the db.'
         print 'now declaring this was a good scrape.'
         db.record_scrape(scrape_timestamp,paid_or_free=paid_or_free)
-        print 'scrape and fill in is finished'
-        
+        print 'scrape and fill in is finished'        
     finally:
         try:
             print 'closing things out'
@@ -146,6 +143,8 @@ if __name__ == "__main__":
             print 'log_file is a :'
             print type(log_file)
             print log_file
+            sys.stdout=sys.__stdout__
+            sys.stderr=sys.__stderr__
             if type(log_file)==file:
                 print 'closing log file'
                 log_file.flush()
