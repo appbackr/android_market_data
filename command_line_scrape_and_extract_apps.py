@@ -111,8 +111,8 @@ if __name__ == "__main__":
         log_file=open(log_path,'w')
         print "log file: "+str(log_file)
         print "now logging to that file"
-        #sys.stdout=log_file
-        #sys.stderr=log_file
+        sys.stdout=log_file
+        sys.stderr=log_file
         print "now logging to file"
         print 'making stdout and stderr unbuffered (actually buffered only per call to write())'
         #sys.stdout=utilities.Unbuffered(sys.stdout)
