@@ -39,15 +39,16 @@ if __name__ == "__main__":
     print 'profiler_web_server_port: '+profiler_web_server_port
     print
 
-    import cherrypy
-    import dowser
-    cherrypy.config.update({'server.socket_port': int(profiler_web_server_port)})
-    cherrypy.config.update({'server.socket_host': '0.0.0.0'})
-    cherrypy.tree.mount(dowser.Root())
-    cherrypy.engine.autoreload.unsubscribe()
+    # for memory profiling:
+    #import cherrypy
+    #import dowser
+    #cherrypy.config.update({'server.socket_port': int(profiler_web_server_port)})
+    #cherrypy.config.update({'server.socket_host': '0.0.0.0'})
+    #cherrypy.tree.mount(dowser.Root())
+    #cherrypy.engine.autoreload.unsubscribe()
     ### Windows only                                                                                                                                                                                    
     ###cherrypy._console_control_handler.unsubscribe()                                                                                                                                                  
-    cherrypy.engine.start()
+    #cherrypy.engine.start()
 
     print 'now starting scrape'
     import os
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     finally:
         try:
             print 'closing things out'
-            cherrypy.engine.exit()
+            #cherrypy.engine.exit()
             print 'log_file is a :'
             print type(log_file)
             print log_file
