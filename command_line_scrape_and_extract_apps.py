@@ -26,7 +26,9 @@ if __name__ == "__main__":
     arg_pos+=1
     max_ending_page=sys.argv[arg_pos]
     arg_pos+=1
-    profiler_web_server_port=sys.argv[arg_pos]
+    database=sys.argv[arg_pos]
+    #arg_pos+=1
+    #profiler_web_server_port=sys.argv[arg_pos]
     print 'working_dir: '+working_dir
     print 'category: ' +category
     print 'paid_or_free: ' +paid_or_free
@@ -36,7 +38,8 @@ if __name__ == "__main__":
     print 'starting_page: ' +starting_page
     print 'max_ending_page: '+max_ending_page
     print 'scrape_timestamp_s: '+scrape_timestamp_s
-    print 'profiler_web_server_port: '+profiler_web_server_port
+    print 'database: '+database
+    #print 'profiler_web_server_port: '+profiler_web_server_port
     print
 
     # for memory profiling:
@@ -128,14 +131,14 @@ if __name__ == "__main__":
             cats=[category]
         print 'categories count: '+str(len(cats))+'  '+str(cats)
         for cat in cats:
-            scrape_and_extract_apps.inhale_market_data(category=cat,paid=(paid_or_free=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),max_ending_page=int(max_ending_page))
+            scrape_and_extract_apps.inhale_market_data(category=cat,paid=(paid_or_free=='paid'), html_cache_path=html_cache_path, resolved_urls_cache_path=resolved_urls_cache_path, scrape_date=scrape_date, extraction_date=extraction_date, database=database, offline=(offline_or_online.lower()=='offline'),starting_page=int(starting_page),max_ending_page=int(max_ending_page))
         print 'finished with scrape.'
         print 'now filling in calculated values in rows'
-        analysis.fill_in_calculated_values(scrape_timestamp)
+        analysis.fill_in_calculated_values(scrape_timestamp,database=database)
         print 'finished with filling in calculated values.'
         #print 'there are now '+count+' apps with this scrape_timestamp in the db.'
         print 'now declaring this was a good scrape.'
-        db.record_scrape(scrape_timestamp,paid_or_free=paid_or_free)
+        db.record_scrape(scrape_timestamp,paid_or_free=paid_or_free,database=database)
         print 'scrape and fill in is finished'        
     finally:
         try:

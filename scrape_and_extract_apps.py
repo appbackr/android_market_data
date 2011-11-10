@@ -6,6 +6,7 @@ from common import utilities
 reload(utilities)
 
 
+
 import urllib2, BeautifulSoup, re, urlparse,  datetime, traceback, time, os
 
 ANDROID_MARKET_SCRAPE_CACHE_FOR_HTML='../cache/dummy_html/' 
@@ -340,7 +341,7 @@ def scrape_category_top_ranked(category_scraped,is_paid,scrape_timestamp,extract
 # note that category can also be a subcategory / subgenre.  In fact I'm not positive that the Android market has any sort of hierarchical idea of categories. That may just be tacked onto the web UI.
 # example: inhale_market_data('GAME',True,'/Users/herdrick/Dropbox/python/appbackr/cache/html_new/','/Users/herdrick/Dropbox/python/appbackr/cache/resolved_urls_new/')
 # example: inhale_market_data('PUZZLE',False,'/Users/herdrick/Dropbox/python/appbackr/cache/html_new/','/Users/herdrick/Dropbox/python/appbackr/cache/resolved_urls_new/')
-def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, scrape_date, extraction_date, offline=False,starting_page=0,max_ending_page=sys.maxint):
+def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, scrape_date, extraction_date, database, offline=False,starting_page=0,max_ending_page=sys.maxint):
     start_time=datetime.datetime.now()
     print 'scrape start time:'+str(start_time)
     if offline:
@@ -371,9 +372,10 @@ def inhale_market_data(category,paid,html_cache_path, resolved_urls_cache_path, 
     # do something with the list of apps here.  for example, persist them.
     from android import db
     reload(db)
-    db.persist_apps(app_l)
+    print 'persisting apps.  db=',database
+    print 'app_l',app_l
+    db.persist_apps(app_l,database=database)
     print '<here is where apps would be persisted>' # comment this out if you are persisting your apps here
-    
     if len(app_l)>0:
         print 'scrape timestamp: '+str(app_l[0]['scrape_timestamp'])
         print 'count of applications extracted  '+str(len(app_l))
